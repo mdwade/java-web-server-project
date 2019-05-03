@@ -1,7 +1,13 @@
+package sn.esp.mglsi.java;
+
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
 import org.jtwig.JtwigModel;
 import org.jtwig.JtwigTemplate;
+import sn.esp.mglsi.java.http.HttpRequest;
+import sn.esp.mglsi.java.http.HttpResponse;
+import sn.esp.mglsi.java.http.HttpStatusCode;
+import sn.esp.mglsi.java.utils.FileHelper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,30 +22,31 @@ import java.util.List;
 public class WebServer implements Runnable {
 
     public static final String SERVER_NAME = "KaWaYe (1.0)";
-    private static final File WEB_ROOT = new File("public_html");
 
-    private static final File TEMPLATES_ROOT = new File("templates");
+    private static final File WEB_ROOT = new File("public_html");
+    private static final File TEMPLATES_DIR = new File("templates");
 
     private static final String DEFAULT_FILE = "index.html";
-    private static final String FILE_NOT_FOUND = "404.html";
-    private static final String METHOD_NOT_SUPPORTED = "not_supported.html";
+    private static final String NOT_FOUND_FILE = "404.html";
+    private static final String METHOD_NOT_SUPPORTED_FILE = "not_supported.html";
+
     // port to listen connection
-    private static final int PORT = 3000;
+    private static final int LISTENING_PORT = 3000;
 
     // verbose mode
     private static final boolean verbose = true;
 
     // Client Connection via Socket Class
-    private Socket connect;
+    private Socket socket;
 
     private WebServer(Socket socket) {
-        connect = socket;
+        this.socket = socket;
     }
 
     public static void main(String[] args) {
         try {
-            ServerSocket serverSocket = new ServerSocket(PORT);
-            System.out.println("Server started.\nListening for connections on port : " + PORT + " ...\n");
+            ServerSocket serverSocket = new ServerSocket(LISTENING_PORT);
+            System.out.println("Server started.\nListening for connections on port : " + LISTENING_PORT + " ...\n");
 
             while (true) {
                 WebServer server = new WebServer(serverSocket.accept());
@@ -57,16 +64,15 @@ public class WebServer implements Runnable {
 
     @Override
     public void run() {
-        // we manage our particular client connection
-        HttpRequest request = null;
-        HttpResponse response = null;
+        HttpRequest req = null;
+        HttpResponse res = null;
 
         try {
-            request = new HttpRequest(connect.getInputStream());
-            response = new HttpResponse(connect.getOutputStream());
+            req = new HttpRequest(socket.getInputStream());
+            res = new HttpResponse(socket.getOutputStream());
 
-            final String method = request.getMethod();
-            final String uri = request.getUri();
+            final String method = req.getMethod();
+            final String uri = req.getUri();
 
             // we support only GET and HEAD methods, we check
             if (!method.equals("GET") && !method.equals("HEAD")) {
@@ -74,57 +80,60 @@ public class WebServer implements Runnable {
                     System.out.println("501 Not Implemented : " + method + " method.");
                 }
 
-                File file = new File(WEB_ROOT, METHOD_NOT_SUPPORTED);
+                File file = new File(WEB_ROOT, METHOD_NOT_SUPPORTED_FILE);
 
-                response.setStatusCode(HttpStatusCode.NOT_IMPLEMENTED)
+                res.setStatusCode(HttpStatusCode.NOT_IMPLEMENTED)
                         .addHeader(HttpHeaders.CONTENT_TYPE, ContentType.TEXT_HTML)
                         .setContent(file);
 
             } else {
 
-                File file = new File(WEB_ROOT, uri);
+                File requestedFile = new File(WEB_ROOT, uri);
 
-                if (file.exists()) {
+                if (requestedFile.exists()) {
 
-                    if (file.isDirectory()) {
-                        File defaultFile = new File(file, DEFAULT_FILE);
+                    if (requestedFile.isDirectory()) {
+                        //The requested file is a directory so
+                        //We check if it has an index.html file.
+                        //if it does, we return it, otherwise we
+                        //list the directory content
+                        File defaultFile = new File(requestedFile, DEFAULT_FILE);
 
                         if (defaultFile.exists()) {
-                            byte[] bytes = FileHelper.readFileBytes(defaultFile);
-
-                            response.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.TEXT_HTML)
-                                    .addHeader(HttpHeaders.CONTENT_LENGTH, bytes.length)
-                                    .setContent(bytes)
+                            //The default file exists
+                            //we return it to the client
+                            res.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.TEXT_HTML)
+                                    .setContent(defaultFile)
                                     .send();
 
                         } else {
-
-                            File[] dirContent = file.listFiles();
+                            //The default file doesn't exist
+                            //we return the directory content
+                            File[] dirContent = requestedFile.listFiles();
                             List<String> items = new ArrayList<>();
 
                             for (File f : dirContent) {
                                 items.add(f.getName());
                             }
 
-                            JtwigTemplate template = JtwigTemplate.fileTemplate(new File(TEMPLATES_ROOT, "directory_content.twig"));
+                            JtwigTemplate template = JtwigTemplate.fileTemplate(new File(TEMPLATES_DIR, "directory_content.twig"));
                             JtwigModel model = JtwigModel.newModel().with("items", items);
 
-                            response.render(template, model);
+                            res.render(template, model);
                         }
 
                     } else {
-                        byte[] fileBytes = FileHelper.readFileBytes(file);
-
-                        response.setStatusCode(HttpStatusCode.OK)
-                                .addHeader(HttpHeaders.CONTENT_TYPE, getContentType(file.getName()))
-                                .addHeader(HttpHeaders.CONTENT_LENGTH, fileBytes.length)
-                                .setContent(fileBytes)
+                        //The requested file is not a directory and it exits.
+                        //We simply return it
+                        res.addHeader(HttpHeaders.CONTENT_TYPE, getContentType(requestedFile.getName()))
+                                .setContent(requestedFile)
                                 .send();
                     }
 
                 } else {
+
                     try {
-                        fileNotFound(response);
+                        fileNotFound(res);
 
                     } catch (IOException ioe) {
                         System.err.println("Error with file not found exception : " + ioe.getMessage());
@@ -151,9 +160,9 @@ public class WebServer implements Runnable {
 
         } finally {
             try {
-                request.close();
-                response.close();
-                connect.close(); // we close socket connection
+                req.close();
+                res.close();
+                socket.close(); // we close socket connection
 
             } catch (Exception e) {
                 System.err.println("Error closing stream : " + e.getMessage());
@@ -166,20 +175,23 @@ public class WebServer implements Runnable {
 
     }
 
-    private ContentType getContentType(String fileRequested) {
+    private String getContentType(String fileRequested) {
         if (fileRequested.endsWith(".htm") || fileRequested.endsWith(".html")) {
-            return ContentType.TEXT_HTML;
+            return ContentType.TEXT_HTML.toString();
 
         } else if (fileRequested.endsWith(".json")) {
-            return ContentType.APPLICATION_JSON;
+            return ContentType.APPLICATION_JSON.toString();
+
+        } else if (fileRequested.endsWith(".css")) {
+            return "text/css";
 
         } else {
-            return ContentType.TEXT_PLAIN;
+            return ContentType.TEXT_PLAIN.toString();
         }
     }
 
     private void fileNotFound(HttpResponse res) throws IOException {
-        File notFoundFile = new File(WEB_ROOT, FILE_NOT_FOUND);
+        File notFoundFile = new File(WEB_ROOT, NOT_FOUND_FILE);
 
         res.setStatusCode(HttpStatusCode.NOT_FOUND)
                 .addHeader(HttpHeaders.CONTENT_TYPE, ContentType.TEXT_HTML)

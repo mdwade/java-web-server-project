@@ -1,8 +1,8 @@
-// LICENSE GPL 3.0 Peter Pilgrim, Xenonique.co.uk, 2012
+package sn.esp.mglsi.java.http;// LICENSE GPL 3.0 Peter Pilgrim, Xenonique.co.uk, 2012
 // http://www.gnu.org/licenses/gpl.html GNU PUBLIC LICENSE 3.0
 
 /**
- * Implementation type HttpStatusCode
+ * Implementation type sn.esp.mglsi.java.http.HttpStatusCode
  * <p>
  * (Only codes 400 to 417 and codes 500 to 524 implemented)
  *

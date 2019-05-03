@@ -1,6 +1,10 @@
+package sn.esp.mglsi.java.http;
+
 import org.apache.http.HttpHeaders;
 import org.jtwig.JtwigModel;
 import org.jtwig.JtwigTemplate;
+import sn.esp.mglsi.java.WebServer;
+import sn.esp.mglsi.java.utils.FileHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,7 +42,7 @@ public class HttpResponse {
     }
 
     private String getStatusLine(HttpStatusCode httpStatusCode) {
-        return String.format("HTTP/1.1 %s %s", httpStatusCode.getCode(), httpStatusCode.asText());
+        return String.format("HTTP/1.1 %s %s", httpStatusCode.getCode(), httpStatusCode.getDesc());
     }
 
     public HttpResponse setContent(byte[] bytes) {
