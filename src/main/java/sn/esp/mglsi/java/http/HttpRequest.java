@@ -39,20 +39,24 @@ public class HttpRequest {
 
         do {
             currentLine = bufferedReader.readLine();
+            //System.out.println(currentLine);
 
             //We check whether the first line has been read or not
             //If not, we retrieve the status line details
             if (isFirstLine) {
                 StringTokenizer parse = new StringTokenizer(currentLine);
                 this.method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
+                System.out.println(this.method);
                 this.uri = parse.nextToken().toLowerCase();
                 isFirstLine = false;
 
             } else {
+                //System.out.println(currentLine);
                 //addHeader(currentLine);
             }
 
         } while (!currentLine.equals(""));
+
     }
 
     /*private void addHeader(String headerLine) {

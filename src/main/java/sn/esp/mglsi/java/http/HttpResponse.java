@@ -1,9 +1,8 @@
 package sn.esp.mglsi.java.http;
 
 import org.apache.http.HttpHeaders;
-import org.jtwig.JtwigModel;
-import org.jtwig.JtwigTemplate;
 import sn.esp.mglsi.java.WebServer;
+import sn.esp.mglsi.java.model.Template;
 import sn.esp.mglsi.java.utils.FileHelper;
 
 import java.io.File;
@@ -24,11 +23,6 @@ public class HttpResponse {
         this.mOutputStream = outputStream;
         mHeaders = new HashMap<>();
         addDefaultHeaders();
-    }
-
-    public HttpResponse(OutputStream outputStream, Map<String, String> defaultHeaders) {
-        this.mOutputStream = outputStream;
-        this.mHeaders = defaultHeaders;
     }
 
     public HttpResponse addHeader(String header, Object value) {
@@ -92,10 +86,10 @@ public class HttpResponse {
         out.flush();
     }
 
-    public void render(JtwigTemplate template, JtwigModel model) throws IOException {
+    public void render(Template template) throws IOException {
         this.putHeaders();
 
-        template.render(model, mOutputStream);
+        Template.render(template, mOutputStream);
 
         mOutputStream.flush();
     }
