@@ -1,14 +1,13 @@
 package sn.esp.mglsi.java.http;
 
 import org.apache.http.HttpHeaders;
+import org.apache.http.entity.ContentType;
+import org.python.util.PythonInterpreter;
 import sn.esp.mglsi.java.WebServer;
 import sn.esp.mglsi.java.model.Template;
 import sn.esp.mglsi.java.utils.FileHelper;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,11 +42,6 @@ public class HttpResponse {
 
     private String getStatusLine(HttpStatusCode httpStatusCode) {
         return String.format("HTTP/1.1 %s %s", httpStatusCode.getCode(), httpStatusCode.getDesc());
-    }
-
-    public HttpResponse setContent(byte[] bytes) {
-        this.mContent = bytes;
-        return this;
     }
 
     public HttpResponse setContent(File file) throws IOException {
@@ -92,10 +86,22 @@ public class HttpResponse {
         out.flush();
     }
 
-    public void render(Template template) throws IOException {
+    public void renderTemplate(Template template) throws IOException {
+        addHeader(HttpHeaders.CONTENT_TYPE, ContentType.TEXT_HTML);
         this.putHeaders();
 
         Template.render(template, mOutputStream);
+
+        mOutputStream.flush();
+    }
+
+    public void renderPythonScript(File pythonFile) throws IOException {
+        this.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.TEXT_PLAIN);
+        this.putHeaders();
+
+        PythonInterpreter interpreter = new PythonInterpreter();
+        interpreter.setOut(mOutputStream);
+        interpreter.execfile(new FileInputStream(pythonFile));
 
         mOutputStream.flush();
     }

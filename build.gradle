@@ -16,4 +16,6 @@ dependencies {
     compile "org.jtwig:jtwig-core:5.87.0.RELEASE"
     // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.1'
+    //compile files('libs/jython-standalone-2.7.0.jar')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
 }

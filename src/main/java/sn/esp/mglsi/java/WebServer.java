@@ -2,6 +2,7 @@ package sn.esp.mglsi.java;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
+import org.python.util.PythonInterpreter;
 import sn.esp.mglsi.java.http.HttpRequest;
 import sn.esp.mglsi.java.http.HttpResponse;
 import sn.esp.mglsi.java.http.HttpStatusCode;
@@ -9,6 +10,7 @@ import sn.esp.mglsi.java.model.FolderContent;
 import sn.esp.mglsi.java.model.Template;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -74,7 +76,7 @@ public class WebServer implements Runnable {
 
                 Template template = Template.getInstance(Template.Type.NOT_SUPPORTED_TEMPLATE);
                 res.setStatusCode(HttpStatusCode.NOT_IMPLEMENTED)
-                        .render(template);
+                        .renderTemplate(template);
 
             } else {
                 File requestedFile = new File(WEB_ROOT, uri);
@@ -107,14 +109,16 @@ public class WebServer implements Runnable {
                                 File[] contentArray = requestedFile.listFiles();
                                 List<FolderContent> folderContents = new ArrayList<>();
 
-                                for (File f : contentArray) {
-                                    folderContents.add(new FolderContent(f));
+                                if (contentArray != null) {
+                                    for (File f : contentArray) {
+                                        folderContents.add(new FolderContent(f));
+                                    }
                                 }
 
-                                Template instance = Template.getInstance(Template.Type.FOLDER_CONTENT_TEMPLATE);
-                                instance.addData("folderContents", folderContents);
+                                Template template = Template.getInstance(Template.Type.FOLDER_CONTENT_TEMPLATE);
+                                template.addData("folderContents", folderContents);
 
-                                res.render(instance);
+                                res.renderTemplate(template);
                             }
 
                         } else {
@@ -126,17 +130,26 @@ public class WebServer implements Runnable {
 
                     } else {
                         //The requested resource is not a directory and it exits.
-                        //We simply return it
-                        res.addHeader(HttpHeaders.CONTENT_TYPE, getContentType(requestedFile.getName()))
-                                .setContent(requestedFile)
-                                .send();
+                        //We check if the file is a python file. If that's the case
+                        //We render to content and we return it to the client
+                        if (requestedFile.getName().endsWith(".py")) {
+                            res.renderPythonScript(requestedFile);
+
+                        } else {
+                            //If the requested file is not a python file we simply
+                            //return it
+                            res.addHeader(HttpHeaders.CONTENT_TYPE, getContentType(requestedFile.getName()))
+                                    .setContent(requestedFile)
+                                    .send();
+                        }
+
                     }
 
                 } else {
 
                     Template template = Template.getInstance(Template.Type.NOT_FOUND_TEMPLATE);
                     res.setStatusCode(HttpStatusCode.NOT_FOUND)
-                            .render(template);
+                            .renderTemplate(template);
                 }
             }
 
