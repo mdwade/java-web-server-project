@@ -7,12 +7,15 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HttpRequest {
     private InputStream is;
     private String uri;
     private String method;
     private Map<String, String> headers = new HashMap<>();
+    private final static String HTTP_HEADER_PATTERN = "^([^:]+):(.*)$";
 
     public HttpRequest(InputStream inputStream) throws IOException {
         process(inputStream);
@@ -33,38 +36,31 @@ public class HttpRequest {
         // It reads bytes and decodes them into characters using a specified charset.
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
-        boolean isFirstLine = true;
+        String currentLine = bufferedReader.readLine();
 
-        String currentLine;
+        //We retrieve the method and the URI from the first line
+        if (currentLine != null && !currentLine.equals("")) {
+            StringTokenizer parse = new StringTokenizer(currentLine);
+            this.method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
+            this.uri = parse.nextToken().toLowerCase();
+        }
 
-        do {
+        //We retrieve the headers from the remaining lines
+        while (currentLine != null && !currentLine.equals("")) {
             currentLine = bufferedReader.readLine();
-            //System.out.println(currentLine);
 
-            //We check whether the first line has been read or not
-            //If not, we retrieve the status line details
-            if (isFirstLine) {
-                StringTokenizer parse = new StringTokenizer(currentLine);
-                this.method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
-                System.out.println(this.method);
-                this.uri = parse.nextToken().toLowerCase();
-                isFirstLine = false;
+            Pattern pattern = Pattern.compile(HTTP_HEADER_PATTERN);
+            Matcher m = pattern.matcher(currentLine);
 
-            } else {
-                //System.out.println(currentLine);
-                //addHeader(currentLine);
+            if (m.find()) {
+                addHeader(m.group(1), m.group(2));
             }
-
-        } while (!currentLine.equals(""));
-
+        }
     }
 
-    /*private void addHeader(String headerLine) {
-        //if(Pattern.matches(""))
-        String headerName = headerLine.split(":")[0];
-        String headerValue = headerLine.split(":")[1];
-        headers.put(headerName, headerValue);
-    }*/
+    private void addHeader(String name, String value) {
+        headers.put(name, value);
+    }
 
     public Map<String, String> getHeaders() {
         return headers;
