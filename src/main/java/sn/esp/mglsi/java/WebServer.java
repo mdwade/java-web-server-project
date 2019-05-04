@@ -73,7 +73,8 @@ public class WebServer implements Runnable {
             if (!method.equals("GET") && !method.equals("HEAD")) {
 
                 Template template = Template.getInstance(Template.Type.NOT_SUPPORTED_TEMPLATE);
-                res.render(template);
+                res.setStatusCode(HttpStatusCode.NOT_IMPLEMENTED)
+                        .render(template);
 
             } else {
                 File requestedFile = new File(WEB_ROOT, uri);
@@ -120,9 +121,7 @@ public class WebServer implements Runnable {
                             //If the uri doesn't have a trailing slash, we ask the browser
                             //to reload the page by returning a 308 status code (Permanent redirect)
                             //and giving it the new uri with the trailing slash added
-                            res.setStatusCode(HttpStatusCode.PERMANENT_REDIRECT)
-                                    .addHeader(HttpHeaders.LOCATION, String.format("%s/", uri))
-                                    .send();
+                            res.redirect(String.format("%s/", uri));
                         }
 
                     } else {
@@ -136,7 +135,8 @@ public class WebServer implements Runnable {
                 } else {
 
                     Template template = Template.getInstance(Template.Type.NOT_FOUND_TEMPLATE);
-                    res.render(template);
+                    res.setStatusCode(HttpStatusCode.NOT_FOUND)
+                            .render(template);
                 }
             }
 

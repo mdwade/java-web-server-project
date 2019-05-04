@@ -35,6 +35,12 @@ public class HttpResponse {
         return this;
     }
 
+    public void redirect(String uri) throws IOException {
+        setStatusCode(HttpStatusCode.PERMANENT_REDIRECT);
+        addHeader(HttpHeaders.LOCATION, uri);
+        send();
+    }
+
     private String getStatusLine(HttpStatusCode httpStatusCode) {
         return String.format("HTTP/1.1 %s %s", httpStatusCode.getCode(), httpStatusCode.getDesc());
     }
