@@ -1,0 +1,121 @@
+* {
+  font-family: 'Roboto Slab', serif;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+@brownColor: #E7CE9C;
+@darkBrownColor: #6B4E4E;
+@greenColor: #8ADD2A;
+
+body {
+  @navHeight: 80px;
+
+  #wrapper {
+    width: 100%;
+    height: calc(100% - @navHeight);
+    padding: 15px;
+
+    > a {
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .back-button {
+      padding: 8px 25px;
+      border: none;
+      //border: 2px solid @darkBrownColor;
+      font-size: 17px;
+      cursor: pointer;
+      //background-color: transparent;
+      background-color: @brownColor;
+      color: @darkBrownColor;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      outline: none;
+
+      img {
+        height: 20px;
+        margin-right: 15px;
+      }
+
+      &:hover {
+        background-color: darken(@brownColor, 5%);
+      }
+    }
+
+    table {
+      border-collapse: collapse;
+
+      td:not(:first-child), th:not(:first-child) {
+        padding: 5px 10px;
+      }
+
+      td {
+        @iconSize: 25px;
+
+        svg, img {
+          width: @iconSize;
+          height: @iconSize;
+        }
+      }
+    }
+
+    > .title {
+      margin-bottom: 15px;
+      color: @darkBrownColor;
+      box-shadow: 1px 1px 25px 1px rgba(0, 0, 0, 0.01);
+      padding: 10px;
+      border-radius: 5px;
+      border-bottom: 2px solid @brownColor;
+    }
+  }
+
+  nav {
+    box-shadow: 1px 1px 25px 1px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    height: @navHeight;
+    display: flex;
+    align-items: center;
+    //padding: 0 0px;
+
+    img {
+      height: 100%;
+    }
+
+    .brand {
+      //text-align: center;
+
+      h1 {
+        font-size: 30px;
+        color: @brownColor;
+        line-height: 0.9;
+
+        span {
+          color: @greenColor;
+        }
+      }
+
+      em {
+        font-size: 16px;
+        font-family: 'Merienda', cursive;
+        color: @darkBrownColor;
+      }
+    }
+  }
+
+  h1, h2, h3, h4 {
+    margin: 0;
+    padding: 0;
+  }
+}

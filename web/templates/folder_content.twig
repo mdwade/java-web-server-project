@@ -1,68 +1,69 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
+<head>
     <meta charset="utf-8">
-    <title>Default Page</title>
-  </head>
-  <body>
-    {#
+    <title>Ocha Server</title>
+    <link rel="shortcut icon" type="image/png" href="/.assets/favicon.ico"/>
+    <link href="https://fonts.googleapis.com/css?family=Merienda|Roboto+Slab" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/.assets/style.min.css">
+</head>
+<body>
+<nav>
+    <img src="/.assets/logo.jpg" alt="logo">
+
+    <div class="brand">
+        <h1><span>Ocha</span>Server</h1>
+        <em>D&eacute;ployez en un clic</em>
+    </div>
+</nav>
+<div id="wrapper">
+    <h1 class="title">Contenu du r&eacute;pertoire {{ uri }}</h1>
+
+    {% if(uri != "/") %}
+        <a href="{{ parentUri }}">
+            <button class="back-button"><img src="/.assets/back.png" alt="back"> Revenir plus haut</button>
+        </a>
+    {% endif %}
+
     <table>
-      {% for item in items %}
-        <tr>
-          <td>
-            <a href="{{ item }}">{{ item }}</a>
-          </td>
-        </tr>
-      {% endfor %}
-    </table>
-    #}
-
-    <style type="text/css">
-      table{
-        border-collapse: collapse;
-      }
-
-      td:not(:first-child), th:not(:first-child){
-        padding: 5px 10px;
-      }
-
-      td svg  {
-        width: 30px;
-        height: 30px;
-      }
-
-    </style>
-    <h1>Contenu du répertoire</h1>
-    <table>
-      <thead>
-        <tr>
-          <th></th>
-          <th>Name</th>
-          <th>Last Modified</th>
-          <th>Size</th>
-      </tr>
-      </thead>
-      <tbody>
+        <tbody>
         {% for item in folderContents %}
-          <tr>
-            <td>
-              {% if (item.type == "FILE") %}
-                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
-width="128" height="128"
-viewBox="0 0 128 128"
-style=" fill:#000000;"><g>  <g>   <g>     <g>       <path fill="#F7F7FB" d="M85,9H24.7c-2.5,0-4.6,2.1-4.6,4.6v100.8c0,2.5,2.1,4.6,4.6,4.6h78.5c2.5,0,4.6-2.1,4.6-4.6V31.9L85,9          v18.3c0,2.5,2.1,4.6,4.6,4.6h18.3"></path>     </g>    </g>    <g>     <path fill="#DEDFE6" d="M85.1,94.5H41c-1.7,0-3-1.3-3-3s1.3-3,3-3h44.1c1.7,0,3,1.3,3,3S86.8,94.5,85.1,94.5z"></path>   </g>    <g>     <path fill="#DEDFE6" d="M85.1,76.2H41c-1.7,0-3-1.3-3-3s1.3-3,3-3h44.1c1.7,0,3,1.3,3,3S86.8,76.2,85.1,76.2z"></path>   </g>    <g>     <path fill="#DEDFE6" d="M85.1,57.8H41c-1.7,0-3-1.3-3-3s1.3-3,3-3h44.1c1.7,0,3,1.3,3,3S86.8,57.8,85.1,57.8z"></path>   </g>    <g>     <g>       <g>         <g>                         <path fill="none" stroke="#464C55" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="             M107.9,31.9"></path>          </g>        </g>      </g>    </g>  </g>  <g>   <g>     <g>                 <path fill="none" stroke="#464C55" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="         M107.9,31.9"></path>      </g>    </g>    <g>     <path fill="#464C55" d="M110,29.8L87.1,6.9C86.5,6.4,85.6,6,84.7,6c0,0,0,0,0,0H24.7c-4.2,0-7.6,3.4-7.6,7.6v100.8       c0,4.2,3.4,7.6,7.6,7.6h78.6c4.2,0,7.6-3.4,7.6-7.6V31.9C110.9,31.1,110.5,30.3,110,29.8z M88,16.2l12.7,12.7H89.6        c-0.9,0-1.6-0.7-1.6-1.6V16.2z M104.8,114.4c0,0.9-0.7,1.6-1.6,1.6H24.7c-0.9,0-1.6-0.7-1.6-1.6V13.6c0-0.9,0.7-1.6,1.6-1.6h57.2        v15.3c0,4.2,3.4,7.6,7.6,7.6h15.3V114.4z"></path>    </g>  </g></g></svg>
-              {% else %}
-<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 60 60" style="enable-background:new 0 0 60 60;" xml:space="preserve"><path d="M57.49,21.5H54v-6.268c0-1.507-1.226-2.732-2.732-2.732H26.515l-5-7H2.732C1.226,5.5,0,6.726,0,8.232v43.687l0.006,0c-0.005,0.563,0.17,1.114,0.522,1.575C1.018,54.134,1.76,54.5,2.565,54.5h44.759c1.156,0,2.174-0.779,2.45-1.813L60,24.649v-0.177C60,22.75,58.944,21.5,57.49,21.5z M2,8.232C2,7.828,2.329,7.5,2.732,7.5h17.753l5,7h25.782c0.404,0,0.732,0.328,0.732,0.732V21.5H12.731c-0.144,0-0.287,0.012-0.426,0.036c-0.973,0.163-1.782,0.873-2.023,1.776L2,45.899V8.232z M47.869,52.083c-0.066,0.245-0.291,0.417-0.545,0.417H2.565c-0.243,0-0.385-0.139-0.448-0.222c-0.063-0.082-0.16-0.256-0.123-0.408l10.191-27.953c0.066-0.245,0.291-0.417,0.545-0.417H54h3.49c0.38,0,0.477,0.546,0.502,0.819L47.869,52.083z"/><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g></svg>
-              {% endif %}
+            <tr>
+                <td>
+                    {% if (item.category == "FILE") %}
+                        {% set ext = item.extension %}
 
-          </td>
-            <td> <a href="{{ item.name }}">{{ item.name }}</a> </td>
-            <td> {{ item.lastModifiedDate }} </td>
-            <td> {{ item.size }} kb</td>
-          </tr>
+                        {% if(ext == "json") %}
+                            <img src="/.assets/json_logo.png" alt="logo">
+
+                        {% elseif (ext == "css") %}
+                            <img src="/.assets/css_logo.png" alt="logo">
+
+                        {% elseif (ext == "py") %}
+                            <img src="/.assets/python_logo.png" alt="logo">
+
+                        {% elseif (ext == "pdf") %}
+                            <img src="/.assets/pdf_logo.png" alt="logo">
+
+                        {% elseif (ext == "png" or ext == "jpeg" or ext == "jpg") %}
+                            <img src="/.assets/image_logo.png" alt="logo">
+
+                        {% else %}
+                            <img src="/.assets/file.png" alt="logo">
+                            {#                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"width="128" height="128"viewBox="0 0 128 128"style=" fill:#000000;"><g> <g> <g> <g> <path fill="#F7F7FB" d="M85,9H24.7c-2.5,0-4.6,2.1-4.6,4.6v100.8c0,2.5,2.1,4.6,4.6,4.6h78.5c2.5,0,4.6-2.1,4.6-4.6V31.9L85,9 v18.3c0,2.5,2.1,4.6,4.6,4.6h18.3"></path> </g> </g> <g> <path fill="#DEDFE6" d="M85.1,94.5H41c-1.7,0-3-1.3-3-3s1.3-3,3-3h44.1c1.7,0,3,1.3,3,3S86.8,94.5,85.1,94.5z"></path> </g> <g> <path fill="#DEDFE6" d="M85.1,76.2H41c-1.7,0-3-1.3-3-3s1.3-3,3-3h44.1c1.7,0,3,1.3,3,3S86.8,76.2,85.1,76.2z"></path> </g> <g> <path fill="#DEDFE6" d="M85.1,57.8H41c-1.7,0-3-1.3-3-3s1.3-3,3-3h44.1c1.7,0,3,1.3,3,3S86.8,57.8,85.1,57.8z"></path> </g> <g> <g> <g> <g> <path fill="none" stroke="#464C55" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d=" M107.9,31.9"></path> </g> </g> </g> </g> </g> <g> <g> <g> <path fill="none" stroke="#464C55" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d=" M107.9,31.9"></path> </g> </g> <g> <path fill="#464C55" d="M110,29.8L87.1,6.9C86.5,6.4,85.6,6,84.7,6c0,0,0,0,0,0H24.7c-4.2,0-7.6,3.4-7.6,7.6v100.8 c0,4.2,3.4,7.6,7.6,7.6h78.6c4.2,0,7.6-3.4,7.6-7.6V31.9C110.9,31.1,110.5,30.3,110,29.8z M88,16.2l12.7,12.7H89.6 c-0.9,0-1.6-0.7-1.6-1.6V16.2z M104.8,114.4c0,0.9-0.7,1.6-1.6,1.6H24.7c-0.9,0-1.6-0.7-1.6-1.6V13.6c0-0.9,0.7-1.6,1.6-1.6h57.2 v15.3c0,4.2,3.4,7.6,7.6,7.6h15.3V114.4z"></path> </g> </g></g></svg>#}
+                        {% endif %}
+                    {% else %}
+                        <img src="/.assets/folder.png" alt="folder">
+                        {#                        <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 60 60" style="enable-background:new 0 0 60 60;" xml:space="preserve"><path d="M57.49,21.5H54v-6.268c0-1.507-1.226-2.732-2.732-2.732H26.515l-5-7H2.732C1.226,5.5,0,6.726,0,8.232v43.687l0.006,0c-0.005,0.563,0.17,1.114,0.522,1.575C1.018,54.134,1.76,54.5,2.565,54.5h44.759c1.156,0,2.174-0.779,2.45-1.813L60,24.649v-0.177C60,22.75,58.944,21.5,57.49,21.5z M2,8.232C2,7.828,2.329,7.5,2.732,7.5h17.753l5,7h25.782c0.404,0,0.732,0.328,0.732,0.732V21.5H12.731c-0.144,0-0.287,0.012-0.426,0.036c-0.973,0.163-1.782,0.873-2.023,1.776L2,45.899V8.232z M47.869,52.083c-0.066,0.245-0.291,0.417-0.545,0.417H2.565c-0.243,0-0.385-0.139-0.448-0.222c-0.063-0.082-0.16-0.256-0.123-0.408l10.191-27.953c0.066-0.245,0.291-0.417,0.545-0.417H54h3.49c0.38,0,0.477,0.546,0.502,0.819L47.869,52.083z"/><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g></svg>#}
+                    {% endif %}
+                </td>
+                <td><a href="{{ item.name }}">{{ item.name }}</a></td>
+                <td> {{ item.lastModifiedDate }} </td>
+                <td> {{ item.size }} kb</td>
+            </tr>
         {% endfor %}
-      </tbody>
+        </tbody>
     </table>
-
-  </body>
+</div>
+</body>
 </html>

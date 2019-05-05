@@ -105,5 +105,4 @@ public enum HttpStatusCode {
     public String getDesc() {
         return desc;
     }
-
 }

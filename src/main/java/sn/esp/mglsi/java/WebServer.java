@@ -2,15 +2,14 @@ package sn.esp.mglsi.java;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
-import org.python.util.PythonInterpreter;
 import sn.esp.mglsi.java.http.HttpRequest;
 import sn.esp.mglsi.java.http.HttpResponse;
 import sn.esp.mglsi.java.http.HttpStatusCode;
 import sn.esp.mglsi.java.model.FolderContent;
 import sn.esp.mglsi.java.model.Template;
+import sn.esp.mglsi.java.utils.FileHelper;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -20,7 +19,7 @@ import java.util.List;
 
 public class WebServer implements Runnable {
 
-    public static final String SERVER_NAME = "KaWaYe (1.0)";
+    public static final String SERVER_NAME = "Ocha Server (1.0)";
 
     private static final File WEB_ROOT = new File("public_html");
 
@@ -70,6 +69,8 @@ public class WebServer implements Runnable {
             final String method = req.getMethod();
             final String uri = req.getUri();
 
+            System.out.println(String.format("Requested uri: %s", uri));
+
             //We check if we received something different
             //from GET and HEAD requests.
             if (!method.equals("GET") && !method.equals("HEAD")) {
@@ -111,12 +112,21 @@ public class WebServer implements Runnable {
 
                                 if (contentArray != null) {
                                     for (File f : contentArray) {
-                                        folderContents.add(new FolderContent(f));
+                                        //If the File instance is a directory and begins with a dot (.),
+                                        //we don't display it
+                                        if (!FileHelper.isHiddenFolder(f)) {
+                                            folderContents.add(new FolderContent(f));
+                                        }
                                     }
                                 }
 
                                 Template template = Template.getInstance(Template.Type.FOLDER_CONTENT_TEMPLATE);
+
                                 template.addData("folderContents", folderContents);
+                                template.addData("uri", uri);
+
+                                String parentUri = requestedFile.getParent().substring(WEB_ROOT.getPath().length()) + "/";
+                                template.addData("parentUri", parentUri);
 
                                 res.renderTemplate(template);
                             }
@@ -174,7 +184,6 @@ public class WebServer implements Runnable {
 
     }
 
-    //TODO: Handle the contentType properly
     private String getContentType(String fileName) {
         if (fileName.endsWith(".htm") || fileName.endsWith(".html")) {
             return ContentType.TEXT_HTML.toString();

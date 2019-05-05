@@ -1,0 +1,6 @@
+{
+    "allowedExtensions":[".less"],
+    "minified": true,
+    "watchFolder": ".",
+    "outputFolder": "."
+}
